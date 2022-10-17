@@ -1,4 +1,4 @@
-# Contributing to ZITADEL
+# Contributing to ZITADEL-nextjs
 
 ## Introduction
 
