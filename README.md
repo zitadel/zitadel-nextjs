@@ -87,7 +87,7 @@ Note that signIn method requires the id of the provider we provided earlier, and
 import { signIn, signOut, useSession } from 'next-auth/client';
 
 export default function Page() {
-    const [session, loading] = useSession();
+    const { data: session } = useSession();
     ...
     {!session && <>
         Not signed in <br />
@@ -109,13 +109,13 @@ To allow session state to be shared between pages - which improves performance, 
 Take a loot at the template `_app.tsx`.
 
 ```ts
-import { Provider } from "next-auth/client";
+import { SessionProvider } from "next-auth/react";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <Provider session={pageProps.session}>
+    <SessionProvider session={pageProps.session}>
       <Component {...pageProps} />
-    </Provider>
+    </SessionProvider>
   );
 }
 
