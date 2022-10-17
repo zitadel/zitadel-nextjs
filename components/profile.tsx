@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 export default function Profile() {
   const { data: session, status } = useSession();
 
-  const loading = status === "loading";
+  const loading = status === 'loading';
 
   return (
     <>
@@ -15,8 +15,8 @@ export default function Profile() {
 
           <button
             onClick={() =>
-              signIn("zitadel", {
-                callbackUrl: "http://localhost:3000/profile",
+              signIn('zitadel', {
+                callbackUrl: 'http://localhost:3000/profile',
               })
             }
           >

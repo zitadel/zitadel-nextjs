@@ -1,5 +1,5 @@
-import NextAuth from "next-auth";
-import ZitadelProvider from "next-auth/providers/zitadel";
+import NextAuth from 'next-auth';
+import ZitadelProvider from 'next-auth/providers/zitadel';
 
 export default NextAuth({
   providers: [

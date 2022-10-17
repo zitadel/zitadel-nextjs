@@ -29,8 +29,8 @@ To setup your configuration, create a file called [...nextauth].tsx in `pages/ap
 You can directly import our ZITADEL provider from [next-auth](https://next-auth.js.org/providers/zitadel).
 
 ```ts
-import NextAuth from "next-auth";
-import ZitadelProvider from "next-auth/providers/zitadel";
+import NextAuth from 'next-auth';
+import ZitadelProvider from 'next-auth/providers/zitadel';
 
 export default NextAuth({
   providers: [
@@ -109,7 +109,7 @@ To allow session state to be shared between pages - which improves performance, 
 Take a loot at the template `_app.tsx`.
 
 ```ts
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider } from 'next-auth/react';
 
 function MyApp({ Component, pageProps }) {
   return (
