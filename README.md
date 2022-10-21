@@ -2,7 +2,7 @@ This is our ZITADEL [Next.js](https://nextjs.org/) template. If shows how to aut
 
 ## Deploy your own
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Fzitadel-nextjs&env=NEXTAUTH_URL,ZITADEL_CLIENT_ID,ZITADEL_CLIENT_SECRET,ZITADEL_ISSUER,NEXTAUTH_SECRET&envDescription=ZITADEL%20Application%20environment&project-name=zitadel-nextjs&repo-name=zitadel-nextjs&redirect-url=https%3A%2F%2Fzitadel.cloud)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Fzitadel-nextjs&env=NEXTAUTH_URL,ZITADEL_CLIENT_ID,ZITADEL_CLIENT_SECRET,ZITADEL_ISSUER,NEXTAUTH_SECRET&envDescription=Navigate%20to%20your%20ZITADEL%20cloud%20application%20and%20copy%20the%20required%20information.%20Provide%20a%20random%20value%20for%20ZITADEL_CLIENT_SECRET%20and%20NEXTAUTH_SECRET&project-name=zitadel-nextjs&repo-name=zitadel-nextjs&redirect-url=https%3A%2F%2Fzitadel.cloud)
 
 ## Getting Started
 
