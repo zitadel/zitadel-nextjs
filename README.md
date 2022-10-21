@@ -1,5 +1,9 @@
 This is our ZITADEL [Next.js](https://nextjs.org/) template. If shows how to authenticate as a user and retrieve user information from the OIDC endpoint.
 
+## Deploy your own
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Fzitadel-nextjs&env=NEXTAUTH_URL,ZITADEL_CLIENT_ID,ZITADEL_CLIENT_SECRET,ZITADEL_ISSUER,NEXTAUTH_SECRET&envDescription=ZITADEL%20Application%20environment&project-name=zitadel-nextjs&repo-name=zitadel-nextjs&redirect-url=https%3A%2F%2Fzitadel.cloud)
+
 ## Getting Started
 
 First, to install the dependencies run:
