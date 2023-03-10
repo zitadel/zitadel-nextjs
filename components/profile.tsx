@@ -1,5 +1,5 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { useEffect } from 'react';
+import Image from 'next/image';
 
 export default function Profile() {
   const { data: session, status } = useSession();
@@ -26,10 +26,13 @@ export default function Profile() {
       )}
       {session && (
         <>
-          <p>
-            Signed in as {session.user.name}
-            <br />
-          </p>
+          <div>
+            {session.user?.image && <Image src={session.user.image} width={40} height={40} alt="user avatar" />}
+            <p>
+              Signed in as {session.user.name}
+              <br />
+            </p>
+          </div>
           <button onClick={() => signOut()}>Sign out</button>
         </>
       )}
