@@ -92,6 +92,7 @@ import { signIn, signOut, useSession } from 'next-auth/client';
 
 export default function Page() {
     const { data: session } = useSession();
+    console.log(session);
     ...
     {!session && <>
         Not signed in <br />
