@@ -2,6 +2,12 @@
 module.exports = {
   reactStrictMode: true,
   images: {
-    domains: [process.env.ZITADEL_ISSUER],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: process.env.ZITADEL_ISSUER.slice(8),
+        pathname: '/assets/v1/**',
+      },
+    ],
   },
 };
