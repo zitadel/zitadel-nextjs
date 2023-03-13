@@ -71,13 +71,15 @@ ZitadelProvider({
 ```
 
 We recommend using the Authentication Code flow secured by PKCE for the Authentication flow.
-To be able to connect to ZITADEL, navigate to your Console Projects, create or select an existing project and add your app selecting WEB, then PKCE, and then add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
+To be able to connect to ZITADEL, navigate to your Console Projects, create or select an existing project and add your app selecting WEB, then CODE, and then add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
 
 For simplicity reasons we set the default to the one that next-auth provides us. You'll be able to change the redirect later if you want to.
 
 Hit Create, then in the detail view of your application make sure to enable dev mode. Dev mode ensures that you can start an auth flow from a non https endpoint for testing.
 
-> Note that we get a clientId but no clientSecret because it is not needed for our authentication flow.
+> Once you have created the application, you will see a dialog providing the clientId and clientSecret.
+
+Copy the secret as it will not be shown again.
 
 Now go to Token settings and check the checkbox for **User Info inside ID Token** to get your users name directly on authentication.
 
@@ -92,7 +94,6 @@ import { signIn, signOut, useSession } from 'next-auth/client';
 
 export default function Page() {
     const { data: session } = useSession();
-    console.log(session);
     ...
     {!session && <>
         Not signed in <br />

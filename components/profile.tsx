@@ -18,7 +18,7 @@ export default function Profile() {
 
   const loading = status === 'loading';
 
-  const { data: user, error, isValidating } = useSWR(`/api/userinfo`, (url) => loadData(url));
+  const { data: user, isValidating } = useSWR(`/api/userinfo`, (url) => loadData(url));
 
   const scope = 'urn:zitadel:iam:org:project:roles';
 
