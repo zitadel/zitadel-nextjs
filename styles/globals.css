@@ -27,3 +27,20 @@ button {
 button:hover {
   background-color: #1a7ef0;
 }
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.user-roles-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.spinner {
+  height: 2rem;
+  width: 2rem;
+}
