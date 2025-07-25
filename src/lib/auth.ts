@@ -2,6 +2,8 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import ZitadelProvider from 'next-auth/providers/zitadel';
 import { randomUUID } from 'crypto';
 import * as oidc from 'openid-client';
+import { ZITADEL_SCOPES } from './scopes';
+
 
 /**
  * Builds a secure logout URL for ZITADEL that includes proper state validation
@@ -94,8 +96,7 @@ export const authOptions: NextAuthOptions = {
       // Configure OAuth scopes and parameters
       authorization: {
         params: {
-          // Request OpenID Connect standard scopes
-          scope: ['openid', 'profile', 'email'].join(' '),
+          scope: ZITADEL_SCOPES,
         },
       },
     }),
