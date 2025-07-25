@@ -1,7 +1,6 @@
-// src/app/api/userinfo/route.ts
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
  * ZITADEL UserInfo API Route
@@ -21,7 +20,7 @@ import { NextRequest, NextResponse } from 'next/server';
  *
  * Extended user profile with ZITADEL-specific claims like roles and metadata.
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   const session = await getServerSession(authOptions);
 
   if (!session?.accessToken) {

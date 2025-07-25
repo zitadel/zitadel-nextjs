@@ -121,6 +121,7 @@ export async function buildLogoutUrl(
  * useSession() hook and getServerSession() function.
  */
 declare module 'next-auth' {
+  // noinspection JSUnusedGlobalSymbols
   interface Session {
     /** The OpenID Connect ID token from ZITADEL - used for logout and user identification */
     idToken?: string;
@@ -138,12 +139,13 @@ declare module 'next-auth' {
  * NextAuth uses for session management.
  */
 declare module 'next-auth/jwt' {
+  // noinspection JSUnusedGlobalSymbols
   interface JWT {
     /** The OpenID Connect ID token from ZITADEL */
     idToken?: string;
     /** The OAuth 2.0 access token for making API calls */
     accessToken?: string;
-    /** The OAuth 2.0 refresh token for obtaining new access tokens */
+    /** The OAuth 2.0 refresh token for getting new access tokens */
     refreshToken?: string;
     /** Unix timestamp (in milliseconds) when the access token expires */
     expiresAt?: number;
@@ -206,6 +208,11 @@ export const authOptions: NextAuthOptions = {
   },
 
   secret: process.env.SESSION_SECRET,
+
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/error',
+  },
 
   callbacks: {
     /**
