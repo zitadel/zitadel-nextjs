@@ -2,8 +2,73 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import ZitadelProvider from 'next-auth/providers/zitadel';
 import { randomUUID } from 'crypto';
 import * as oidc from 'openid-client';
+import { JWT } from 'next-auth/jwt';
 import { ZITADEL_SCOPES } from './scopes';
 
+/**
+ * Automatically refreshes an expired access token using the refresh token.
+ *
+ * When a user's access token expires (typically after 1 hour), this function
+ * seamlessly exchanges the refresh token for a new access token, allowing the
+ * user to continue using the application without having to log in again.
+ *
+ * This is essential for maintaining long-lived sessions and preventing users
+ * from being unexpectedly logged out during active use of the application.
+ *
+ * ## How Token Refresh Works
+ *
+ * 1. **Token Expiry Detection**: NextAuth automatically checks if the access token has expired
+ * 2. **Refresh Request**: Uses the refresh token to request new tokens from ZITADEL
+ * 3. **Token Update**: Updates the JWT with the new access token and expiry time
+ * 4. **Seamless Experience**: User continues without interruption
+ *
+ * ## Error Handling
+ *
+ * If the refresh fails (e.g., refresh token expired, user permissions revoked),
+ * the function sets an error flag that forces the user to sign in again.
+ *
+ * @param token - The current JWT containing the refresh token and other session data
+ * @returns Promise resolving to updated JWT with new tokens or error state
+ */
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+  if (!token.refreshToken) {
+    console.error('No refresh token available for refresh');
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+
+  try {
+    const config = await oidc.discovery(
+      new URL(process.env.ZITADEL_DOMAIN!),
+      process.env.ZITADEL_CLIENT_ID!,
+      process.env.ZITADEL_CLIENT_SECRET,
+    );
+
+    const tokenEndpointResponse = await oidc.refreshTokenGrant(
+      config,
+      token.refreshToken as string,
+    );
+
+    return {
+      ...token,
+      accessToken: tokenEndpointResponse.access_token,
+      expiresAt: tokenEndpointResponse.expires_in
+        ? Date.now() + tokenEndpointResponse.expires_in * 1000
+        : Date.now() + 3600 * 1000,
+      refreshToken: tokenEndpointResponse.refresh_token ?? token.refreshToken,
+      error: undefined,
+    };
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
 
 /**
  * Builds a secure logout URL for ZITADEL that includes proper state validation
