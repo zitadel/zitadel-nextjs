@@ -1,0 +1,31 @@
+# Dependency directories
+node_modules
+
+# Build output
+/dist
+/build
+/out
+.next
+
+# Version control directories
+.git
+
+# Logs
+*.log
+
+# Other common directories to ignore
+/public
+/assets
+
+# Minified files
+*.min.*
+
+# Source maps
+*.map
+
+# Image files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
