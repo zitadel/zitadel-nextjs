@@ -209,6 +209,85 @@ export const authOptions: NextAuthOptions = {
 
   secret: process.env.SESSION_SECRET,
 
+  /**
+   * Custom page configurations for NextAuth.js
+   *
+   * NextAuth.js provides several built-in pages for authentication flows, but
+   * you can customize them to match your application's design and branding.
+   * This configuration overrides the default pages with custom implementations.
+   *
+   * ## Built-in Pages Available
+   *
+   * NextAuth.js includes default pages for common authentication scenarios:
+   * - Sign-in page: Shows available providers and handles authentication
+   * - Sign-out page: Confirmation page for signing out
+   * - Error page: Displays authentication errors with user-friendly messages
+   * - Email verification: For magic link authentication (not used with OAuth)
+   * - New user welcome: Onboarding page for first-time users
+   *
+   * @see https://authjs.dev/guides/pages/built-in-pages
+   *
+   * ## Custom Pages in This Application
+   *
+   * We've customized key pages to provide a consistent user experience that
+   * matches our application's design system and branding.
+   *
+   * ### Sign-in Page (`/auth/signin`)
+   * - **Purpose**: Provides a branded sign-in experience for ZITADEL authentication
+   * - **Features**: Error message display, CSRF protection, callback URL handling
+   * - **Design**: Matches application's design system with consistent styling
+   * - **Preview**: Visit `/auth/signin` or `/auth/signin?error=AccessDenied`
+   *
+   * ### Error Page (`/auth/error`)
+   * - **Purpose**: Displays authentication errors with user-friendly messages
+   * - **Features**: Handles all NextAuth error types (Configuration, AccessDenied, etc.)
+   * - **Design**: Consistent error page styling with recovery options
+   * - **Preview**: Visit `/auth/error?error=Configuration` or `/auth/error?error=AccessDenied`
+   *
+   * ## Testing Custom Pages
+   *
+   * You can preview the custom pages by visiting these URLs:
+   *
+   * ```
+   * # Sign-in page with different error states
+   * http://localhost:3000/auth/signin
+   * http://localhost:3000/auth/signin?error=AccessDenied
+   * http://localhost:3000/auth/signin?error=Configuration
+   * http://localhost:3000/auth/signin?error=OAuthAccountNotLinked
+   *
+   * # Error page with different error types
+   * http://localhost:3000/auth/error?error=Configuration
+   * http://localhost:3000/auth/error?error=AccessDenied
+   * http://localhost:3000/auth/error?error=Verification
+   * ```
+   *
+   * ## Fallback to Built-in Pages
+   *
+   * If you want to use NextAuth's default pages instead of the custom ones,
+   * simply comment out or remove the `pages` configuration:
+   *
+   * ```typescript
+   * // pages: {
+   * //   signIn: '/auth/signin',
+   * //   error: '/auth/error',
+   * // },
+   * ```
+   *
+   * NextAuth will automatically use its built-in pages, which are functional
+   * but have basic styling and may not match your application's design.
+   *
+   * ## Available Page Options
+   *
+   * You can customize any of these NextAuth pages:
+   * - `signIn`: Custom sign-in page (default: `/api/auth/signin`)
+   * - `signOut`: Custom sign-out confirmation page
+   * - `error`: Custom error page (default: `/api/auth/error`)
+   * - `verifyRequest`: Email verification page (for magic links)
+   * - `newUser`: New user welcome/onboarding page
+   *
+   * For this PKCE demo, we only customize the most commonly used pages
+   * (sign-in and error) since we use external OAuth authentication.
+   */
   pages: {
     signIn: '/auth/signin',
     error: '/auth/error',
