@@ -71,41 +71,40 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 }
 
 /**
- * Builds a secure logout URL for ZITADEL that includes proper state validation
- * to prevent CSRF attacks during the logout flow.
+ * Constructs a secure logout URL for ZITADEL with CSRF protection.
  *
- * This function uses the OpenID Connect Discovery protocol to automatically
- * configure the logout endpoint and creates a logout URL with:
- * - ID token hint for proper session termination
- * - Post-logout redirect URI for user experience
- * - State parameter for CSRF protection
+ * This function creates a proper logout URL that terminates the user's session
+ * both in your application and in ZITADEL. It includes security measures to
+ * prevent Cross-Site Request Forgery (CSRF) attacks during the logout process.
  *
- * @param idToken - The user's ID token from their current session
- * @returns Promise containing the logout URL and state for validation
+ * ## Security Features
  *
- * @example
- * ```typescript
- * const session = await getServerSession(authOptions);
- * if (session?.idToken) {
- *   const { url, state } = await buildLogoutUrl(session.idToken);
- *   // Redirect user to logout URL and store state for callback validation
- * }
- * ```
+ * - **State Parameter**: Random UUID for CSRF protection
+ * - **ID Token Hint**: Tells ZITADEL which session to terminate
+ * - **Post-Logout Redirect**: Where to send the user after logout
+ *
+ * ## Logout Flow
+ *
+ * 1. User clicks "logout" in your app
+ * 2. Your app calls this function to get the logout URL
+ * 3. User is redirected to ZITADEL's logout endpoint
+ * 4. ZITADEL terminates the session and redirects back to your app
+ * 5. Your app validates the state parameter for security
+ *
+ * @param idToken - The user's ID token from their current session (used to identify which session to terminate)
+ * @returns Promise containing the logout URL to redirect to and state value for validation
  */
 export async function buildLogoutUrl(
   idToken: string,
 ): Promise<{ url: string; state: string }> {
-  // Discover the ZITADEL OIDC configuration automatically
   const config = await oidc.discovery(
     new URL(process.env.ZITADEL_DOMAIN!),
     process.env.ZITADEL_CLIENT_ID!,
     process.env.ZITADEL_CLIENT_SECRET,
   );
 
-  // Generate a cryptographically secure state parameter for CSRF protection
   const state = randomUUID();
 
-  // Build the logout URL with proper parameters
   const urlObj = oidc.buildEndSessionUrl(config, {
     id_token_hint: idToken,
     post_logout_redirect_uri: process.env.ZITADEL_POST_LOGOUT_URL!,
@@ -116,49 +115,83 @@ export async function buildLogoutUrl(
 }
 
 /**
- * Extend NextAuth.js JWT interface to include the ID token
- * This allows us to store the ID token in the JWT for logout functionality
+ * Extends NextAuth.js Session interface to include ZITADEL-specific tokens.
+ *
+ * This makes ZITADEL tokens available throughout your application via the
+ * useSession() hook and getServerSession() function.
+ */
+declare module 'next-auth' {
+  interface Session {
+    /** The OpenID Connect ID token from ZITADEL - used for logout and user identification */
+    idToken?: string;
+    /** The OAuth 2.0 access token - used for making authenticated API calls to ZITADEL */
+    accessToken?: string;
+    /** Error state indicating if token refresh failed - user needs to re-authenticate */
+    error?: string;
+  }
+}
+
+/**
+ * Extends NextAuth.js JWT interface to store all necessary tokens and metadata.
+ *
+ * This internal interface stores tokens securely in the encrypted JWT that
+ * NextAuth uses for session management.
  */
 declare module 'next-auth/jwt' {
   interface JWT {
     /** The OpenID Connect ID token from ZITADEL */
     idToken?: string;
+    /** The OAuth 2.0 access token for making API calls */
+    accessToken?: string;
+    /** The OAuth 2.0 refresh token for obtaining new access tokens */
+    refreshToken?: string;
+    /** Unix timestamp (in milliseconds) when the access token expires */
+    expiresAt?: number;
+    /** Error flag set when token refresh fails */
+    error?: string;
   }
 }
 
 /**
- * Extend NextAuth.js Session interface to include the ID token
- * This makes the ID token available in session objects throughout the app
- */
-declare module 'next-auth' {
-  interface Session {
-    /** The OpenID Connect ID token from ZITADEL */
-    idToken?: string;
-  }
-}
-
-/**
- * NextAuth.js configuration for ZITADEL integration
+ * Complete NextAuth.js configuration for ZITADEL authentication with token refresh.
  *
- * This configuration implements the OAuth 2.0 Authorization Code Flow with PKCE
- * (Proof Key for Code Exchange) for maximum security. The setup includes:
+ * This configuration implements the industry-standard OAuth 2.0 Authorization Code
+ * Flow with PKCE (Proof Key for Code Exchange) for maximum security. It includes
+ * automatic token refresh to maintain long-lived user sessions.
  *
- * - ZITADEL provider with proper scopes
- * - JWT session strategy for scalability
- * - Custom callbacks for token and session handling
- * - Automatic redirect to profile page after login
+ * ## OAuth Scopes
+ *
+ * Scopes are defined in `scopes.ts` as a simple array. To add/remove scopes,
+ * just comment/uncomment lines in that file.
+ *
+ * ## Session Strategy: JWT vs Database
+ *
+ * This configuration uses JWT strategy because:
+ * - **Stateless**: No database required for session storage
+ * - **Scalable**: Works across multiple server instances
+ * - **Fast**: No database queries for each request
+ * - **Secure**: Tokens are encrypted and signed
+ *
+ * ## Token Lifecycle
+ *
+ * 1. **Initial Login**: User authenticates, receives access/refresh/ID tokens
+ * 2. **Active Use**: Access token used for API calls (valid ~1 hour)
+ * 3. **Token Expiry**: Access token expires, refresh token automatically gets new one
+ * 4. **Long-term**: Process repeats until refresh token expires or user logs out
+ *
+ * ## Callback Functions Explained
+ *
+ * NextAuth uses callback functions to customize the authentication flow:
+ * - **redirect**: Controls where users go after login/logout
+ * - **jwt**: Manages token storage and refresh logic
+ * - **session**: Shapes what data is available to your app
  */
 export const authOptions: NextAuthOptions = {
   providers: [
     ZitadelProvider({
-      // ZITADEL instance URL (e.g., https://my-company.zitadel.cloud)
       issuer: process.env.ZITADEL_DOMAIN!,
-
-      // Application credentials from ZITADEL console
       clientId: process.env.ZITADEL_CLIENT_ID!,
       clientSecret: process.env.ZITADEL_CLIENT_SECRET!,
-
-      // Configure OAuth scopes and parameters
       authorization: {
         params: {
           scope: ZITADEL_SCOPES,
@@ -167,47 +200,96 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  // Session configuration
   session: {
-    // Use JWT strategy for stateless sessions (more scalable)
     strategy: 'jwt',
-
-    // Session expiration time in seconds (from environment variable)
-    maxAge: Number(process.env.SESSION_DURATION) || 3600, // Default 1 hour
+    maxAge: Number(process.env.SESSION_DURATION) || 3600,
   },
 
-  // Secret for signing JWTs and encrypting session data
   secret: process.env.SESSION_SECRET,
 
-  // Custom callback functions for handling authentication flow
   callbacks: {
     /**
-     * Redirect callback - determines where users go after sign in
-     * Always redirects to the profile page regardless of where they came from
+     * Controls where users are redirected after successful authentication.
+     *
+     * This callback runs after a user successfully signs in and determines
+     * their destination. By default, NextAuth would redirect to the page they
+     * came from, but this override ensures all users go to the profile page.
+     *
+     * @param baseUrl - Your application's base URL (e.g., https://yourdomain.com)
+     * @returns The URL to redirect the user to after successful login
      */
     async redirect({ baseUrl }) {
       return `${baseUrl}/profile`;
     },
 
     /**
-     * JWT callback - handles token processing during authentication
-     * Stores the ID token in the JWT for later use in logout flow
+     * Manages JWT token lifecycle including storage and automatic refresh.
+     *
+     * This callback runs every time a JWT is accessed and handles:
+     * 1. **Initial Login**: Stores tokens from the authentication provider
+     * 2. **Token Expiry Check**: Determines if access token needs refreshing
+     * 3. **Automatic Refresh**: Calls refresh function when token expires
+     *
+     * ## When This Runs
+     * - Every time getServerSession() is called
+     * - Every time useSession() updates
+     * - Before each authenticated API request
+     *
+     * ## Token Storage Strategy
+     * - ID Token: Used for logout and user identification
+     * - Access Token: Used for API calls to ZITADEL
+     * - Refresh Token: Used to get new access tokens
+     * - Expiry Time: Used to determine when refresh is needed
+     *
+     * @param token - Current JWT token object
+     * @param account - Authentication provider data (only present on initial login)
+     * @param user - User object (only present on initial login)
+     * @returns Updated JWT token with fresh tokens or error state
      */
-    async jwt({ token, account }) {
-      // Store the ID token when user first signs in
-      if (account?.id_token) {
-        token.idToken = account.id_token;
+    async jwt({ token, account, user }) {
+      if (account && user) {
+        return {
+          ...token,
+          idToken: account.id_token,
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token,
+          expiresAt: account.expires_at
+            ? account.expires_at * 1000
+            : Date.now() + 3600 * 1000,
+          error: undefined,
+        };
       }
-      return token;
+
+      if (Date.now() < (token.expiresAt as number)) {
+        return token;
+      }
+
+      return refreshAccessToken(token);
     },
 
     /**
-     * Session callback - shapes the session object returned to the client
-     * Makes the ID token available in session objects throughout the app
+     * Shapes the session object that your application receives.
+     *
+     * This callback transforms the internal JWT token into the session object
+     * that your application code can access via useSession() or getServerSession().
+     *
+     * ## Security Note
+     * Only include data in the session that your frontend needs. Sensitive
+     * tokens like refresh tokens should NOT be exposed to the client.
+     *
+     * ## Available Data
+     * - **idToken**: For logout functionality
+     * - **accessToken**: For API calls (if needed on client-side)
+     * - **error**: To handle token refresh failures
+     *
+     * @param session - The base session object from NextAuth
+     * @param token - The JWT token containing all stored data
+     * @returns The session object that your application will receive
      */
     async session({ session, token }) {
-      // Add ID token to session for logout functionality
       session.idToken = token.idToken;
+      session.accessToken = token.accessToken;
+      session.error = token.error;
       return session;
     },
   },
