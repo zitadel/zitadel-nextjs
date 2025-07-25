@@ -3,14 +3,14 @@
 import {
   getProviders,
   getCsrfToken,
-  LiteralUnion,
   ClientSafeProvider,
+  LiteralUnion,
 } from 'next-auth/react';
+import { BuiltInProviderType } from 'next-auth/providers/index';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { BuiltInProviderType } from 'next-auth/providers/index';
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -33,7 +33,7 @@ function SignInContent() {
       setCsrfToken(tokenData || '');
     };
 
-    fetchProviders();
+    void fetchProviders();
   }, []);
 
   const getErrorMessage = (errorType: string | null) => {
@@ -94,15 +94,13 @@ function SignInContent() {
           Sign in
         </h1>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{getErrorMessage(error)}</p>
-          </div>
-        )}
-
-        <p className="mt-6 text-lg font-medium text-pretty text-gray-500 sm:text-xl/8">
-          Continue to your account using ZITADEL
+        {/* Error or Default Message */}
+        <p
+          className={`mt-6 text-lg font-medium text-pretty sm:text-xl/8 ${
+            error ? 'text-red-600' : 'text-gray-500'
+          }`}
+        >
+          {error ? getErrorMessage(error) : 'Continue to your account'}
         </p>
 
         {/* Sign In Form */}
