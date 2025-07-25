@@ -178,8 +178,9 @@ declare module 'next-auth/jwt' {
  *
  * 1. **Initial Login**: User authenticates, receives access/refresh/ID tokens
  * 2. **Active Use**: Access token used for API calls (valid ~1 hour)
- * 3. **Token Expiry**: Access token expires, refresh token automatically gets new one
- * 4. **Long-term**: Process repeats until refresh token expires or user logs out
+ * 3. **Token Expiry**: Access token expires, refresh token automatically gets a new one
+ * 4. **Long-term**: Process repeats until the refresh token expires or the
+ *    user logs out
  *
  * ## Callback Functions Explained
  *
@@ -250,15 +251,15 @@ export const authOptions: NextAuthOptions = {
    *
    * ```
    * # Sign-in page with different error states
-   * http://localhost:3000/auth/signin
-   * http://localhost:3000/auth/signin?error=AccessDenied
-   * http://localhost:3000/auth/signin?error=Configuration
-   * http://localhost:3000/auth/signin?error=OAuthAccountNotLinked
+   * http://<hostname>/auth/signin
+   * http://<hostname>/auth/signin?error=AccessDenied
+   * http://<hostname>/auth/signin?error=Configuration
+   * http://<hostname>/auth/signin?error=OAuthAccountNotLinked
    *
    * # Error page with different error types
-   * http://localhost:3000/auth/error?error=Configuration
-   * http://localhost:3000/auth/error?error=AccessDenied
-   * http://localhost:3000/auth/error?error=Verification
+   * http://<hostname>/auth/error?error=Configuration
+   * http://<hostname>/auth/error?error=AccessDenied
+   * http://<hostname>/auth/error?error=Verification
    * ```
    *
    * ## Fallback to Built-in Pages
@@ -359,13 +360,17 @@ export const authOptions: NextAuthOptions = {
      * This callback transforms the internal JWT token into the session object
      * that your application code can access via useSession() or getServerSession().
      *
+     *
      * ## Security Note
+     *
      * Only include data in the session that your frontend needs. Sensitive
      * tokens like refresh tokens should NOT be exposed to the client.
      *
+     *
+     *
      * ## Available Data
      * - **idToken**: For logout functionality
-     * - **accessToken**: For API calls (if needed on client-side)
+     * - **accessToken**: For API calls (if needed on the client-side)
      * - **error**: To handle token refresh failures
      *
      * @param session - The base session object from NextAuth
