@@ -161,7 +161,6 @@ At minimum, configure:
 
 ## Resources
 
-- **Example App Repository:** [Link to your future GitHub repository]
 - **Next.js Documentation:** <https://nextjs.org/docs>
 - **NextAuth.js Documentation:** <https://next-auth.js.org/>
 - **ZITADEL Documentation:** <https://zitadel.com/docs>
