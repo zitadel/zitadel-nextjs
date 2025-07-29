@@ -53,7 +53,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-lg border border-gray-200 p-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Session Information

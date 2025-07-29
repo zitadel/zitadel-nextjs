@@ -73,7 +73,6 @@ function SignInContent() {
   return (
     <main className="flex-1 grid place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
       <div className="text-center max-w-md w-full">
-        {/* Icon */}
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 mb-6">
           <svg
             className="h-8 w-8 text-blue-600"
@@ -89,12 +88,9 @@ function SignInContent() {
             />
           </svg>
         </div>
-
         <h1 className="text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-7xl">
           Sign in
         </h1>
-
-        {/* Error or Default Message */}
         <p
           className={`mt-6 text-lg font-medium text-pretty sm:text-xl/8 ${
             error ? 'text-red-600' : 'text-gray-500'
@@ -103,7 +99,6 @@ function SignInContent() {
           {error ? getErrorMessage(error) : 'Continue to your account'}
         </p>
 
-        {/* Sign In Form */}
         {provider && (
           <div className="mt-10">
             <form
@@ -113,7 +108,6 @@ function SignInContent() {
             >
               <input type="hidden" name="csrfToken" value={csrfToken} />
               <input type="hidden" name="callbackUrl" value={callbackUrl} />
-
               <button
                 type="submit"
                 className="w-full flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
@@ -134,8 +128,6 @@ function SignInContent() {
             </form>
           </div>
         )}
-
-        {/* Back to Home */}
         <div className="mt-8">
           <Link
             href="/"

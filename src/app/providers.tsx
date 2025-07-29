@@ -1,10 +1,7 @@
-'use client'; // ← makes this a Client Component
+'use client';
 
 import { SessionProvider } from 'next-auth/react';
 
 export function ZitadelProvider({ children }: { children: React.ReactNode }) {
-  return (
-    // you can pass next-auth options here if you like
-    <SessionProvider>{children}</SessionProvider>
-  );
+  return <SessionProvider>{children}</SessionProvider>;
 }

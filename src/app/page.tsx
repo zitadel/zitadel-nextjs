@@ -21,7 +21,6 @@ export default function Home() {
                 Zitadel. Perfect for learning OAuth 2.0 security patterns and
                 integrating with your own application.
               </p>
-
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -47,7 +46,6 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                     <svg
@@ -72,7 +70,6 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                     <svg
@@ -99,7 +96,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-
             <div className="flex justify-center">
               <div className="w-full max-w-md">
                 <div className="bg-white rounded-lg border border-gray-200 p-8">
@@ -108,8 +104,8 @@ export default function Home() {
                       <Image
                         src="/openid-logo.svg"
                         alt="OpenID"
-                        width={288} // w-72 = 288px
-                        height={112} // h-28 = 112px
+                        width={288}
+                        height={112}
                         className="w-72 h-28"
                       />
                     </div>
@@ -135,7 +131,6 @@ export default function Home() {
                     </svg>
                     <span>Login</span>
                   </button>
-
                   <div className="text-center">
                     <p className="text-sm text-gray-500 mb-4">
                       What happens when you click the button:
@@ -168,7 +163,6 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-
                 <div className="mt-8 text-center">
                   <p className="text-sm text-gray-500">
                     Powered by

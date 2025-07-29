@@ -16,24 +16,24 @@ import { authOptions, buildLogoutUrl } from '@/lib/auth';
  * that will be validated in the logout callback.
  */
 export async function POST() {
-	const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-	if (!session?.idToken) {
-		return NextResponse.json(
-			{ error: 'No valid session or ID token found' },
-			{ status: 400 }
-		);
-	} else {
-		const { url, state } = await buildLogoutUrl(session.idToken);
-		const response = NextResponse.redirect(url);
+  if (!session?.idToken) {
+    return NextResponse.json(
+      { error: 'No valid session or ID token found' },
+      { status: 400 },
+    );
+  } else {
+    const { url, state } = await buildLogoutUrl(session.idToken);
+    const response = NextResponse.redirect(url);
 
-		response.cookies.set('logout_state', state, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'lax',
-			path: '/api/auth/logout/callback',
-		});
+    response.cookies.set('logout_state', state, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/api/auth/logout/callback',
+    });
 
-		return response;
-	}
+    return response;
+  }
 }

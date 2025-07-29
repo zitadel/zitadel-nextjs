@@ -33,7 +33,6 @@ export default function LogoutSuccessPage() {
             />
           </svg>
         </div>
-
         <h1 className="text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-7xl">
           Logout successful
         </h1>
