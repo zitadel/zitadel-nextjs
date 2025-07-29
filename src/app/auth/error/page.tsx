@@ -3,39 +3,13 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { getMessage } from '@/app/auth/message';
 
 function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error') || 'default';
 
-  const getErrorInfo = (errorType: string) => {
-    switch (errorType.toLowerCase()) {
-      case 'configuration':
-        return {
-          heading: 'Server error',
-          message:
-            'There is a problem with the server configuration. Check the server logs for more information.',
-        };
-      case 'accessdenied':
-        return {
-          heading: 'Access denied',
-          message: 'You do not have permission to sign in.',
-        };
-      case 'verification':
-        return {
-          heading: 'Unable to sign in',
-          message:
-            'The sign in link is no longer valid. It may have been used already or it may have expired.',
-        };
-      default:
-        return {
-          heading: 'Authentication error',
-          message: 'An unexpected error occurred during authentication.',
-        };
-    }
-  };
-
-  const { heading, message } = getErrorInfo(error);
+  const { heading, message } = getMessage(error, 'auth-error');
 
   return (
     <main className="flex-1 grid place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">

@@ -11,6 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { getMessage } from '@/app/auth/message';
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -35,28 +36,6 @@ function SignInContent() {
 
     void fetchProviders();
   }, []);
-
-  const getErrorMessage = (errorType: string | null) => {
-    switch (errorType) {
-      case 'Signin':
-      case 'OAuthSignin':
-      case 'OAuthCallback':
-      case 'OAuthCreateAccount':
-      case 'EmailCreateAccount':
-      case 'Callback':
-        return 'Try signing in with a different account.';
-      case 'OAuthAccountNotLinked':
-        return 'To confirm your identity, sign in with the same account you used originally.';
-      case 'EmailSignin':
-        return 'The email could not be sent.';
-      case 'CredentialsSignin':
-        return 'Sign in failed. Check the details you provided are correct.';
-      case 'SessionRequired':
-        return 'Please sign in to access this page.';
-      default:
-        return 'Unable to sign in.';
-    }
-  };
 
   if (!providers) {
     return (
@@ -96,7 +75,9 @@ function SignInContent() {
             error ? 'text-red-600' : 'text-gray-500'
           }`}
         >
-          {error ? getErrorMessage(error) : 'Continue to your account'}
+          {error
+            ? getMessage(error, 'signin-error').message
+            : 'Continue to your account'}
         </p>
 
         {provider && (
