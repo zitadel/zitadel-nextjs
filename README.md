@@ -64,9 +64,13 @@ ZITADEL_DOMAIN="https://your-zitadel-domain"
 # request.
 ZITADEL_CLIENT_ID="your-client-id"
 
-# Client Secret for confidential applications. Leave empty for public clients.
-# Only required if you selected "Confidential" when creating your ZITADEL app.
-ZITADEL_CLIENT_SECRET=""
+# While the Authorization Code Flow with PKCE for public clients
+# does not strictly require a client secret for OIDC specification compliance,
+# AuthJS will still require a value for its internal configuration.
+# Therefore, please provide a randomly generated string here.
+# You can generate a secure key using:
+# node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
 
 # OAuth callback URL where ZITADEL redirects after user authentication. This
 # MUST exactly match a Redirect URI configured in your ZITADEL application.
