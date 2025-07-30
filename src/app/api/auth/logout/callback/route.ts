@@ -23,15 +23,7 @@ export async function GET(request: NextRequest) {
     const successUrl = new URL('/logout/success', request.url);
     const response = NextResponse.redirect(successUrl);
 
-    response.cookies.delete({
-      name: 'logout_state',
-      path: '/',
-    });
-    response.cookies.delete({
-      name: 'next-auth.session-token',
-      path: '/',
-    });
-
+    response.headers.set('Clear-Site-Data', '"cookies"');
     return response;
   } else {
     const errorUrl = new URL('/logout/error', request.url);
