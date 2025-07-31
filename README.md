@@ -1,146 +1,170 @@
-This is our ZITADEL [Next.js](https://nextjs.org/) template. It shows how to authenticate as a user and retrieve user information from the OIDC endpoint.
+# Next.js with ZITADEL
 
-## Deploy your own
+[Next.js](https://nextjs.org/) is a React framework that enables you to create full-stack web applications by extending the latest React features, and integrating powerful Rust-based JavaScript tooling for the fastest builds. In a modern setup, your Next.js application manages both your application's frontend and backend logic through API routes and server components.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Fzitadel-nextjs&env=NEXTAUTH_URL,ZITADEL_CLIENT_ID,ZITADEL_CLIENT_SECRET,ZITADEL_ISSUER,NEXTAUTH_SECRET&envDescription=Navigate%20to%20your%20ZITADEL%20cloud%20application%20and%20copy%20the%20required%20information.%20Provide%20a%20random%20value%20for%20ZITADEL_CLIENT_SECRET%20and%20NEXTAUTH_SECRET&project-name=zitadel-nextjs&repo-name=zitadel-nextjs&redirect-url=https%3A%2F%2Fzitadel.cloud)
+To secure such an application, you need a reliable way to handle user logins. For the Next.js ecosystem, [NextAuth.js](https://next-auth.js.org/) (now Auth.js) is the standard and recommended library for authentication. Think of it as a flexible security guard for your app. This guide demonstrates how to use NextAuth.js with a Next.js application to implement a secure login with ZITADEL.
 
-## Getting Started
+We'll be using the **OpenID Connect (OIDC)** protocol with the **Authorization Code Flow + PKCE**. This is the industry-best practice for security, ensuring that the login process is safe from start to finish. You can learn more in our [guide to OAuth 2.0 recommended flows](https://zitadel.com/docs/guides/integrate/login/oidc/oauth-recommended-flows).
 
-First, to install the dependencies run:
+This example uses **NextAuth.js**, the standard for Next.js authentication. While ZITADEL doesn't offer a specific SDK, NextAuth.js is highly modular. It works with a "provider" that handles the communication with ZITADEL. Under the hood, this example uses the powerful OIDC standard to manage the secure PKCE flow.
+
+Check out our Example Application to see it in action.
+
+## Example Application
+
+The example repository includes a complete Next.js application, ready to run, that demonstrates how to integrate ZITADEL for user authentication.
+
+This example application showcases a typical web app authentication pattern: users start on a public landing page, click a login button to authenticate with ZITADEL, and are then redirected to a protected profile page displaying their user information. The app also includes secure logout functionality that clears the session and redirects users back to ZITADEL's logout endpoint. All protected routes are automatically secured using NextAuth.js middleware and session management, ensuring only authenticated users can access sensitive areas of your application.
+
+### Prerequisites
+
+Before you begin, ensure you have the following:
+
+#### System Requirements
+
+- Node.js (v20 or later is recommended)
+- npm, yarn, or pnpm package manager
+
+#### Account Setup
+
+You'll need a ZITADEL account and application configured. Follow the [ZITADEL documentation on creating applications](https://zitadel.com/docs/guides/integrate/login/oidc/web-app) to set up your account and create a Web application with Authorization Code + PKCE flow.
+
+> **Important:** Configure the following URLs in your ZITADEL application settings:
+>
+> - **Redirect URIs:** Add `http://localhost:3000/auth/callback` (for development)
+> - **Post Logout Redirect URIs:** Add `http://localhost:3000/api/auth/logout/callback` (for development)
+>
+> These URLs must exactly match what your Next.js application uses. For production, add your production URLs.
+
+### Configuration
+
+To run the application, you first need to copy the `.env.example` file to a new file named `.env.local` and fill in your ZITADEL application credentials.
+
+```dotenv
+# Port number where your Next.js server will listen for incoming HTTP requests.
+# Change this if port 3000 is already in use on your system.
+PORT=3000
+
+# Session timeout in seconds. Users will be automatically logged out after this
+# duration of inactivity. 3600 seconds = 1 hour.
+SESSION_DURATION=3600
+
+# Secret key used to cryptographically sign session cookies to prevent
+# tampering. MUST be a long, random string. Generate a secure key using:
+# node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+SESSION_SECRET="your-very-secret-and-strong-session-key"
+
+# Your ZITADEL instance domain URL. Found in your ZITADEL console under
+# instance settings. Include the full https:// URL.
+# Example: https://my-company-abc123.zitadel.cloud
+ZITADEL_DOMAIN="https://your-zitadel-domain"
+
+# Application Client ID from your ZITADEL application settings. This unique
+# identifier tells ZITADEL which application is making the authentication
+# request.
+ZITADEL_CLIENT_ID="your-client-id"
+
+# While the Authorization Code Flow with PKCE for public clients
+# does not strictly require a client secret for OIDC specification compliance,
+# AuthJS will still require a value for its internal configuration.
+# Therefore, please provide a randomly generated string here.
+# You can generate a secure key using:
+# node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ZITADEL_CLIENT_SECRET="your-randomly-generated-client-secret"
+
+# OAuth callback URL where ZITADEL redirects after user authentication. This
+# MUST exactly match a Redirect URI configured in your ZITADEL application.
+ZITADEL_CALLBACK_URL="http://localhost:3000/auth/callback"
+
+# URL where users are redirected after logout. This should match a Post Logout
+# Redirect URI configured in your ZITADEL application settings.
+ZITADEL_POST_LOGOUT_URL="http://localhost:3000/api/auth/logout/callback"
+
+# NextAuth.js base URL for your application. In development, this is typically
+# http://localhost:3000. In production, use your actual domain.
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+### Installation and Running
+
+Follow these steps to get the application running:
 
 ```bash
-yarn install
+# 1. Clone the repository
+git clone git@github.com:zitadel/example-auth-nextjs.git
+
+cd example-auth-nextjs
+
+# 2. Install the project dependencies
+npm install
+
+# 3. Start the development server
+npm run dev
 ```
 
-then create a file `.env` in the root of the project and add the following keys to it.
-You can find your Issuer Url on the application detail page in console.
+The application will now be running at `http://localhost:3000`.
 
-```
-NEXTAUTH_URL=http://localhost:3000
-ZITADEL_ISSUER=[yourIssuerUrl]
-ZITADEL_CLIENT_ID=[yourClientId]
-ZITADEL_CLIENT_SECRET=[randomvalue]
-NEXTAUTH_SECRET=[randomvalue]
-```
+## Key Features
 
-next-auth requires a secret for all providers, so just define a random value here.
-then open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### PKCE Authentication Flow
 
-# Configuration
+The application implements the secure Authorization Code Flow with PKCE (Proof Key for Code Exchange), which is the recommended approach for modern web applications.
 
-NextAuth.js exposes a REST API which is used by your client.
-To setup your configuration, create a file called [...nextauth].tsx in `pages/api/auth`.
-You can directly import our ZITADEL provider from [next-auth](https://next-auth.js.org/providers/zitadel).
+### Session Management
 
-```ts
-import NextAuth from 'next-auth';
-import ZitadelProvider from 'next-auth/providers/zitadel';
+Built-in session management with NextAuth.js handles user authentication state across your application, with automatic token refresh and secure session storage.
 
-export default NextAuth({
-  providers: [
-    ZitadelProvider({
-      issuer: process.env.ZITADEL_ISSUER,
-      clientId: process.env.ZITADEL_CLIENT_ID,
-      clientSecret: process.env.ZITADEL_CLIENT_SECRET,
-    }),
-  ],
-});
-```
+### Route Protection
 
-You can overwrite the default callbacks too, just append them to the ZITADEL provider.
+Protected routes automatically redirect unauthenticated users to the login flow, ensuring sensitive areas of your application remain secure.
 
-```ts
-...
-ZitadelProvider({
-    issuer: process.env.ZITADEL_ISSUER,
-    clientId: process.env.ZITADEL_CLIENT_ID,
-    clientSecret: process.env.ZITADEL_CLIENT_SECRET,
-    async profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          firstName: profile.given_name,
-          lastName: profile.family_name,
-          email: profile.email,
-          loginName: profile.preferred_username,
-          image: profile.picture,
-        };
-    },
-}),
-...
+### Logout Flow
+
+Complete logout implementation that properly terminates both the local session and the ZITADEL session, with proper redirect handling.
+
+## TODOs
+
+### 1. Security headers (Next.js built-in)
+
+**Partially enabled.** Next.js includes some security headers by default, but consider adding custom headers in `next.config.js`:
+
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline';",
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+    ];
+  },
+};
 ```
 
-We recommend using the Authentication Code flow secured by PKCE for the Authentication flow.
-To be able to connect to ZITADEL, navigate to your Console Projects, create or select an existing project and add your app selecting WEB, then CODE, and then add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
+At minimum, configure:
 
-For simplicity reasons we set the default to the one that next-auth provides us. You'll be able to change the redirect later if you want to.
+- `Content-Security-Policy` (CSP)
+- `X-Frame-Options` / `frame-ancestors`
+- `Referrer-Policy`
+- `Permissions-Policy`
 
-Hit Create, then in the detail view of your application make sure to enable dev mode. Dev mode ensures that you can start an auth flow from a non https endpoint for testing.
+## Resources
 
-> Once you have created the application, you will see a dialog providing the clientId and clientSecret.
-
-Copy the secret as it will not be shown again.
-
-Now go to Token settings and check the checkbox for **User Info inside ID Token** to get your users name directly on authentication.
-
-# User interface
-
-Now we can start editing the homepage by modifying `pages/index.tsx`.
-Add this snippet your file. This code gets your auth session from next-auth, renders a Logout button if your authenticated or shows a Signup button if your not.
-Note that signIn method requires the id of the provider we provided earlier, and provides a possibilty to add a callback url, Auth Next will redirect you to the specified route if logged in successfully.
-
-```ts
-import { signIn, signOut, useSession } from 'next-auth/client';
-
-export default function Page() {
-    const { data: session } = useSession();
-    ...
-    {!session && <>
-        Not signed in <br />
-        <button onClick={() => signIn('zitadel', { callbackUrl: 'http://localhost:3000/profile' })}>
-            Sign in
-        </button>
-    </>}
-    {session && <>
-        Signed in as {session.user.email} <br />
-        <button onClick={() => signOut()}>Sign out</button>
-    </>}
-    ...
-}
-```
-
-### Session state
-
-To allow session state to be shared between pages - which improves performance, reduces network traffic and avoids component state changes while rendering - you can use the NextAuth.js Provider in `/pages/_app.tsx`.
-Take a loot at the template `_app.tsx`.
-
-```ts
-import { SessionProvider } from 'next-auth/react';
-
-function MyApp({ Component, pageProps }) {
-  return (
-    <SessionProvider session={pageProps.session}>
-      <Component {...pageProps} />
-    </SessionProvider>
-  );
-}
-
-export default MyApp;
-```
-
-Last thing: create a `profile.tsx` in /pages which renders the callback page.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **Next.js Documentation:** <https://nextjs.org/docs>
+- **NextAuth.js Documentation:** <https://next-auth.js.org/>
+- **ZITADEL Documentation:** <https://zitadel.com/docs>
